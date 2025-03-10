@@ -1,0 +1,16 @@
+services:
+  tor-clearnet:
+    image: ghcr.io/e3ndr/tor-clearnet:latest
+    restart: unless-stopped
+    environment:
+      DOMAIN: "example.com"
+      SOCKS_PROXY: "tor-simple"
+      SOCKS_PORT: "9050"
+    depends_on:
+      - tor-simple
+    ports:
+      - 9000:80 # Change 9000 to your liking.
+
+  tor-simple:
+    image: osminogin/tor-simple
+    restart: unless-stopped

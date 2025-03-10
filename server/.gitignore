@@ -1,0 +1,16 @@
+# IntelliJ
+*.iml
+.idea/
+
+# Eclipse
+.settings/
+.project
+.classpath
+
+# Common
+target/
+.DS_Store
+
+# Misc
+config.json
+database.sqlite
