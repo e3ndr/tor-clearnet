@@ -3,7 +3,7 @@ services:
     image: ghcr.io/e3ndr/tor-clearnet:latest
     restart: unless-stopped
     environment:
-      DOMAIN: "example.com"
+      DOMAINS: "example.com"
       SOCKS_PROXY: "tor-simple"
       SOCKS_PORT: "9050"
     depends_on:
