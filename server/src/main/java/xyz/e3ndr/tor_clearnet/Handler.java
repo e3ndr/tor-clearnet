@@ -177,9 +177,13 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
     }
 
     private static String replace(String input, String onionHost, String clearnetHost) {
+        if (clearnetHost.startsWith("https-")) {
+            clearnetHost = clearnetHost.substring("https-".length());
+        }
+
         return input
             .replace("https://" + onionHost, "https://https-" + onionHost) // https://abc.onion -> https://https-abc.onion
-            .replace(onionHost, clearnetHost); // abc.onion -> abc.onion.example
+            .replace(onionHost, clearnetHost); // abc.onion -> abc.onion.example OR https-abc.onion -> https-abc.onion.example
     }
 
     private static HttpResponse respondText(Response response, HttpStatus status, String onionHost, String clearnetHost) throws IOException {
