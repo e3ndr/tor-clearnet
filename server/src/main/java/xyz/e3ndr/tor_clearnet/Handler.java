@@ -144,7 +144,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
 
             HttpResponse result;
             if (HeaderUtils.isTextType(response.header("Content-Type"))) {
-                result = respondText(response, status, onionHost, session.uri().host);
+                result = respondText(response, status);
             } else {
                 result = respondBinary(response, status);
             }
@@ -153,6 +153,12 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
                 String key = header.getFirst();
                 String value = header.getSecond();
 
+                if (key.equalsIgnoreCase("Content-Security-Policy")) {
+                    String modifiedValue = Rewriter.rewriteCsp(value);
+                    result.header(key, modifiedValue);
+                    continue;
+                }
+
                 if (key.equalsIgnoreCase("Transfer-Encoding") ||
                     key.equalsIgnoreCase("Content-Length") ||
                     key.equalsIgnoreCase("Content-Encoding") ||
@@ -160,13 +166,13 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
                     continue;
                 }
 
-                String modifiedValue = replace(value, onionHost, session.uri().host);
+                String modifiedValue = Rewriter.rewrite(value);
                 result.header(key, modifiedValue);
             }
 
             return result
                 .mime(response.header("Content-Type"))
-                .header("X-Clearnet-Proxy", session.uri().host);
+                .header("X-Clearnet-Proxy", (onionHttps ? "https://" : "http://") + onionHost);
         } catch (Throwable t) {
             t.printStackTrace();
             if (response != null) {
@@ -176,18 +182,8 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
         }
     }
 
-    private static String replace(String input, String onionHost, String clearnetHost) {
-        if (clearnetHost.startsWith("https-")) {
-            clearnetHost = clearnetHost.substring("https-".length());
-        }
-
-        return input
-            .replace("https://" + onionHost, "https://https-" + onionHost) // https://abc.onion -> https://https-abc.onion
-            .replace(onionHost, clearnetHost); // abc.onion -> abc.onion.example OR https-abc.onion -> https-abc.onion.example
-    }
-
-    private static HttpResponse respondText(Response response, HttpStatus status, String onionHost, String clearnetHost) throws IOException {
-        String str = replace(response.body().string(), onionHost, clearnetHost);
+    private static HttpResponse respondText(Response response, HttpStatus status) throws IOException {
+        String str = Rewriter.rewrite(response.body().string());
         return HttpResponse.newFixedLengthResponse(status, str);
     }
 

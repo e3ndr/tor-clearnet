@@ -4,7 +4,8 @@ services:
     restart: unless-stopped
     environment:
       SERVICE_NAME: "My TorClearnet Proxy"
-      DOMAINS: ".example.com"
+      SERVICE_DOMAIN: "onion.example.com" # What you replace "onion" with. e.g abc.onion -> abc.onion.example.com
+      SERVICE_SUPPORTS_HTTPS: "false"
       BLOCKLISTS: "ahmia"
       SOCKS_PROXY: "tor-simple"
       SOCKS_PORT: "9050"

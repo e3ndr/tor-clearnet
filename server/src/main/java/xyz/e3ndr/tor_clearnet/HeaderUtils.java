@@ -8,10 +8,20 @@ public class HeaderUtils {
             return host;
         }
 
-        for (String domain : TorClearnet.DOMAINS) {
-            if (host.endsWith(domain)) {
-                return host.substring(0, host.length() - domain.length());
+        if (TorClearnet.SERVICE_DOMAIN == null) {
+            // We're in DNS-only mode.
+            return null;
+        }
+
+        if (host.endsWith(TorClearnet.SERVICE_DOMAIN)) {
+            String result = host.substring(0, host.length() - TorClearnet.SERVICE_DOMAIN.length());
+            if (!result.endsWith(".onion")) {
+                if (!result.endsWith(".")) {
+                    result += ".";
+                }
+                result += "onion";
             }
+            return result;
         }
 
         return null; // Unrecognized clearnet domain name
