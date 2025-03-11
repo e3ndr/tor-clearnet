@@ -77,8 +77,12 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
             onionHost = onionHost.substring("https-".length());
         }
 
-        if (Blocklist.shouldBlock(onionHost)) {
-            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.UNAVAILABLE_FOR_LEAGAL_REASONS, "tor-clearnet: Blocked.");
+        List<String> blockedBy = Blocklist.shouldBlock(onionHost);
+        if (blockedBy != null) {
+            return HttpResponse.newFixedLengthResponse(
+                StandardHttpStatus.UNAVAILABLE_FOR_LEAGAL_REASONS,
+                "tor-clearnet: Domain appears in the following blocklists:\n- " + String.join("\n- ", blockedBy)
+            );
         }
 
         String onionUrl = String.format(

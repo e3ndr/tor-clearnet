@@ -44,17 +44,20 @@ public abstract class Blocklist {
 
     protected abstract void refresh() throws IOException;
 
+    protected abstract String name();
+
     /**
      * @return true, if the domain should be blocked.
      */
     protected abstract boolean checkDomain0(String domain);
 
-    public static boolean shouldBlock(String domain) {
+    public static List<String> shouldBlock(String domain) {
+        List<String> thoseWhoBlock = new ArrayList<>(BLOCKLISTS.size());
         for (Blocklist blocklist : BLOCKLISTS) {
             if (blocklist.checkDomain(domain)) {
-                return true;
+                thoseWhoBlock.add(blocklist.name());
             }
         }
-        return false;
+        return thoseWhoBlock;
     }
 }

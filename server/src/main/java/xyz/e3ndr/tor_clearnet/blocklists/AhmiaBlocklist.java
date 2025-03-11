@@ -28,6 +28,11 @@ public class AhmiaBlocklist extends Blocklist {
         return this.list.contains(md5hash(domain));
     }
 
+    @Override
+    protected String name() {
+        return "Ahmia.fi";
+    }
+
     @SneakyThrows
     private static String md5hash(String input) {
         MessageDigest md = MessageDigest.getInstance("MD5");
