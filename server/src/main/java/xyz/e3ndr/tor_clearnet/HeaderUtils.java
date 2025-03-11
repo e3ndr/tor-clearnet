@@ -1,8 +1,5 @@
 package xyz.e3ndr.tor_clearnet;
 
-import co.casterlabs.rhs.protocol.HeaderValue;
-import co.casterlabs.rhs.protocol.http.HttpSession;
-
 public class HeaderUtils {
 
     public static String getOnionAddress(String host) {
@@ -35,17 +32,6 @@ public class HeaderUtils {
         if (mime.contains("application/wasm")) return true;
 
         return false;
-    }
-
-    private static boolean h_eq(HttpSession session, String header, String value) {
-        return session.headers().getSingleOrDefault(header, HeaderValue.EMPTY).raw().equalsIgnoreCase(value);
-    }
-
-    public static boolean isSecure(HttpSession session) {
-        return h_eq(session, "X-Forwarded-Proto", "https") ||
-            h_eq(session, "X-Url-Scheme", "https") ||
-            h_eq(session, "Front-End-Https", "on") ||
-            h_eq(session, "X-Forwarded-Ssl", "on");
     }
 
 }

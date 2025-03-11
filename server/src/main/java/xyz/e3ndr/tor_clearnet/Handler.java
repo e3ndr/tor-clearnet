@@ -72,13 +72,18 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
             return HttpResponse.newFixedLengthResponse(StandardHttpStatus.NOT_FOUND, "tor-clearnet: Unrecognized clearnet domain: " + session.uri().host);
         }
 
+        boolean onionHttps = onionHost.startsWith("https-");
+        if (onionHttps) {
+            onionHost = onionHost.substring("https-".length());
+        }
+
         if (!Blocklist.check(onionHost)) {
             return HttpResponse.newFixedLengthResponse(StandardHttpStatus.UNAVAILABLE_FOR_LEAGAL_REASONS, "tor-clearnet: Blocked.");
         }
 
         String onionUrl = String.format(
             "%s://%s%s",
-            HeaderUtils.isSecure(session) ? "https" : "http",
+            onionHttps ? "https" : "http",
             onionHost, session.uri().rawPath
         );
 
@@ -151,8 +156,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
                     continue;
                 }
 
-                String modifiedValue = value // Modify Location, CSP, etc to the current clearnet domain.
-                    .replace(onionHost, session.uri().host);
+                String modifiedValue = replace(value, onionHost, session.uri().host);
                 result.header(key, modifiedValue);
             }
 
@@ -168,9 +172,14 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
         }
     }
 
+    private static String replace(String input, String onionHost, String clearnetHost) {
+        return input
+            .replace("https://" + onionHost, "https://https-" + onionHost) // https://abc.onion -> https://https-abc.onion
+            .replace(onionHost, clearnetHost); // abc.onion -> abc.onion.example
+    }
+
     private static HttpResponse respondText(Response response, HttpStatus status, String onionHost, String clearnetHost) throws IOException {
-        String str = response.body().string()
-            .replace(onionHost, clearnetHost);
+        String str = replace(response.body().string(), onionHost, clearnetHost);
         return HttpResponse.newFixedLengthResponse(status, str);
     }
 
