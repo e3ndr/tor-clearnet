@@ -172,7 +172,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
             if (response != null) {
                 response.close();
             }
-            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.INTERNAL_ERROR, "tor-clearnet: An internal server error occurred.");
+            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.INTERNAL_ERROR, "tor-clearnet: An internal server error occurred: " + t.getMessage());
         }
     }
 
