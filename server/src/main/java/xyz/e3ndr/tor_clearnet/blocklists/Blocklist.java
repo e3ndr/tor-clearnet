@@ -1,6 +1,9 @@
 package xyz.e3ndr.tor_clearnet.blocklists;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -10,9 +13,13 @@ import okhttp3.OkHttpClient;
 public abstract class Blocklist {
     private static final long REFRESH_INTERVAL = TimeUnit.MINUTES.toMillis(15);
 
-    private static final Blocklist[] BLOCKSLISTS = {
-            new AhmiaBlocklist()
-    };
+    private static final List<Blocklist> BLOCKLISTS = new ArrayList<>();
+    static {
+        List<String> blockLists = Arrays.asList(System.getenv().getOrDefault("BLOCKLISTS", "").toLowerCase().split(","));
+        if (blockLists.contains("ahmia")) {
+            BLOCKLISTS.add(new AhmiaBlocklist());
+        }
+    }
 
     protected static final OkHttpClient http = new OkHttpClient.Builder()
         .build();
@@ -43,7 +50,7 @@ public abstract class Blocklist {
     protected abstract boolean checkDomain0(String domain);
 
     public static boolean shouldBlock(String domain) {
-        for (Blocklist blocklist : BLOCKSLISTS) {
+        for (Blocklist blocklist : BLOCKLISTS) {
             if (blocklist.checkDomain(domain)) {
                 return true;
             }
