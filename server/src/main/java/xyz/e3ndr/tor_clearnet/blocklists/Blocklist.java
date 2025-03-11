@@ -37,14 +37,17 @@ public abstract class Blocklist {
 
     protected abstract void refresh() throws IOException;
 
+    /**
+     * @return true, if the domain should be blocked.
+     */
     protected abstract boolean checkDomain0(String domain);
 
-    public static boolean check(String domain) {
+    public static boolean shouldBlock(String domain) {
         for (Blocklist blocklist : BLOCKSLISTS) {
-            if (!blocklist.checkDomain(domain)) {
-                return false;
+            if (blocklist.checkDomain(domain)) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 }
