@@ -9,6 +9,8 @@ import co.casterlabs.rhs.protocol.http.HttpProtocol;
 
 public class TorClearnet {
 
+    public static final String SERVICE_NAME = System.getenv().getOrDefault("SERVICE_NAME", "e3ndr/tor-clearnet");
+
     public static final Proxy PROXY = new Proxy(
         Proxy.Type.SOCKS,
         new InetSocketAddress(
@@ -29,7 +31,7 @@ public class TorClearnet {
     public static void main(String[] args) throws Exception {
         HttpServer server = new HttpServerBuilder()
             .withPort(80)
-            .withServerHeader("e3ndr/tor-clearnet")
+            .withServerHeader(SERVICE_NAME)
             .withTaskExecutor(RakuraiTaskExecutor.INSTANCE)
             .with(new HttpProtocol(), Handler.INSTANCE)
 //            .with(new WebsocketProtocol(), Handler.INSTANCE)

@@ -69,7 +69,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
     public HttpResponse handle(HttpSession session) throws HttpException, DropConnectionException {
         String onionHost = HeaderUtils.getOnionAddress(session.uri().host);
         if (onionHost == null) {
-            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.NOT_FOUND, "tor-clearnet: Unrecognized clearnet domain: " + session.uri().host);
+            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.NOT_FOUND, TorClearnet.SERVICE_NAME + ": Unrecognized clearnet domain: " + session.uri().host);
         }
 
         boolean onionHttps = onionHost.startsWith("https-");
@@ -81,7 +81,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
         if (blockedBy != null) {
             return HttpResponse.newFixedLengthResponse(
                 StandardHttpStatus.UNAVAILABLE_FOR_LEAGAL_REASONS,
-                "tor-clearnet: Domain appears in the following blocklists:\n- " + String.join("\n- ", blockedBy)
+                TorClearnet.SERVICE_NAME + ": Domain appears in the following blocklists:\n- " + String.join("\n- ", blockedBy)
             );
         }
 
@@ -172,7 +172,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
             if (response != null) {
                 response.close();
             }
-            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.INTERNAL_ERROR, "tor-clearnet: An internal server error occurred: " + t.getMessage());
+            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.INTERNAL_ERROR, TorClearnet.SERVICE_NAME + ": An internal server error occurred: " + t.getMessage());
         }
     }
 
