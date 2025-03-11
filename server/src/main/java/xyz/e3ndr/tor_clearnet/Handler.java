@@ -78,7 +78,7 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
         }
 
         List<String> blockedBy = Blocklist.shouldBlock(onionHost);
-        if (blockedBy != null) {
+        if (!blockedBy.isEmpty()) {
             return HttpResponse.newFixedLengthResponse(
                 StandardHttpStatus.UNAVAILABLE_FOR_LEAGAL_REASONS,
                 TorClearnet.SERVICE_NAME + ": Domain appears in the following blocklists:\n- " + String.join("\n- ", blockedBy)
