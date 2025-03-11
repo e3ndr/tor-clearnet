@@ -26,6 +26,7 @@ import okhttp3.Response;
 import okhttp3.internal.http.HttpMethod;
 import okio.BufferedSink;
 import okio.Okio;
+import xyz.e3ndr.tor_clearnet.blocklists.Blocklist;
 
 public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
     private static final List<String> DISALLOWED_HEADERS = Arrays.asList(
@@ -69,6 +70,10 @@ public class Handler implements HttpProtoHandler/*, WebsocketHandler*/ {
         String onionHost = HeaderUtils.getOnionAddress(session.uri().host);
         if (onionHost == null) {
             return HttpResponse.newFixedLengthResponse(StandardHttpStatus.NOT_FOUND, "tor-clearnet: Unrecognized clearnet domain: " + session.uri().host);
+        }
+
+        if (!Blocklist.check(onionHost)) {
+            return HttpResponse.newFixedLengthResponse(StandardHttpStatus.UNAVAILABLE_FOR_LEAGAL_REASONS, "tor-clearnet: Blocked.");
         }
 
         String onionUrl = String.format(
